@@ -1,5 +1,5 @@
 import pandas as pd
-import math
+
 
 
 data=pd.read_csv(r'../data/bengaluru_house_prices.csv')
