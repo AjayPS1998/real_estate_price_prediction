@@ -4,7 +4,6 @@ import pickle
 import os
 import sys
 
-# Ensure src can be found if needed for unpickling
 sys.path.append('../src')
 
 paths = {
@@ -13,13 +12,11 @@ paths = {
     'data': './data/bengaluru_house_prices.csv'
 }
 
-# Verify files exist
 for name, path in paths.items():
     if not os.path.exists(path):
         st.error(f"Missing File: {path} (PWD: {os.getcwd()})")
         st.stop()
 
-# Load Models
 with open(paths['pipeline'], 'rb') as f:
     full_pipeline = pickle.load(f)
     preprocessor = full_pipeline.named_steps['preprocessor']
@@ -27,7 +24,6 @@ with open(paths['pipeline'], 'rb') as f:
 with open(paths['model'], 'rb') as f:
     lin_model = pickle.load(f)
 
-# Load and Prep Data for Dropdowns
 data = pd.read_csv(paths['data'])
 
 data[['location', 'society']] = data[['location', 'society']].fillna('unknown')
@@ -39,7 +35,6 @@ for col in ['area_type', 'availability', 'location', 'society']:
 
 st.title("House Price Prediction")
 
-# Inputs
 total_sqft = st.number_input("Total Square Feet", value=1000.0)
 bath = st.number_input("Bathrooms", min_value=1, value=2, step=1)
 bhk = st.number_input("BHK", min_value=1, value=2, step=1)
@@ -69,6 +64,9 @@ if st.button("Predict"):
     try:
         processed_data = preprocessor.transform(input_data)
         prediction = lin_model.predict(processed_data)
-        st.header(f"Result: {prediction[0]:.2f} Lakhs")
+        
+        final_result = max(10.0, prediction[0])
+        
+        st.header(f"Result: {final_result:.2f} Lakhs")
     except Exception as e:
         st.error(f"Prediction Error: {e}")
